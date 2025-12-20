@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 min-h-screen">
+    <div class="max-w-3xl mx-auto p-4 pt-12">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-red-500 to-pink-500 rounded-full mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">YouTube Downloader</h1>
+            <p class="text-gray-600">Download YouTube videos and audio in high quality</p>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8 rounded-r-lg">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <div>
+                    <p class="text-sm text-yellow-800 font-semibold">Educational Use Only</p>
+                    <p class="text-xs text-yellow-700 mt-1">This tool is for educational purposes. Respect copyright laws and YouTube's Terms of Service.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl shadow-2xl p-8">
+            <!-- Input Section -->
+            <div id="input-section">
+                <label class="block text-sm font-medium text-gray-700 mb-2">YouTube Video URL</label>
+                <div class="flex gap-3 mb-6">
+                    <input 
+                        type="text" 
+                        id="url-input"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none transition"
+                    />
+                    <button 
+                        id="generate-btn"
+                        class="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                    >
+                        Generate
+                    </button>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-600 mb-2 font-semibold">How to use:</p>
+                    <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                        <li>Copy a YouTube video URL</li>
+                        <li>Paste it in the input field above</li>
+                        <li>Click "Generate" to validate</li>
+                        <li>Choose to download video (MP4) or audio (MP3)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Download Section (Hidden Initially) -->
+            <div id="download-section" class="hidden">
+                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <p class="text-sm text-gray-600 mb-1">Ready to download:</p>
+                    <p id="video-title" class="font-semibold text-gray-800"></p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <button 
+                        id="download-video-btn"
+                        class="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition disabled:opacity-50"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Download Video (MP4)</span>
+                    </button>
+
+                    <button 
+                        id="download-audio-btn"
+                        class="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition disabled:opacity-50"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                        </svg>
+                        <span>Download Audio (MP3)</span>
+                    </button>
+                </div>
+
+                <button 
+                    id="reset-btn"
+                    class="w-full px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition"
+                >
+                    Download Another Video
+                </button>
+            </div>
+
+            <!-- Message Display -->
+            <div id="message" class="hidden mt-6 p-4 rounded-lg"></div>
+        </div>
+
+        <!-- Features -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-lg p-4 shadow-lg text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-1">High Quality Video</h3>
+                <p class="text-sm text-gray-600">Download videos in best available quality</p>
+            </div>
+
+            <div class="bg-white rounded-lg p-4 shadow-lg text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-1">MP3 Audio</h3>
+                <p class="text-sm text-gray-600">Extract audio in high-quality MP3 format</p>
+            </div>
+
+            <div class="bg-white rounded-lg p-4 shadow-lg text-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </div>
+                <h3 class="font-semibold text-gray-800 mb-1">Fast & Secure</h3>
+                <p class="text-sm text-gray-600">Direct downloads with no tracking</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-gray-600">
+            <p>Built for educational purposes • Respect content creators and copyright laws</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        
+        const urlInput = document.getElementById('url-input');
+        const generateBtn = document.getElementById('generate-btn');
+        const inputSection = document.getElementById('input-section');
+        const downloadSection = document.getElementById('download-section');
+        const videoTitle = document.getElementById('video-title');
+        const downloadVideoBtn = document.getElementById('download-video-btn');
+        const downloadAudioBtn = document.getElementById('download-audio-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const messageDiv = document.getElementById('message');
+
+        let currentUrl = '';
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `mt-6 p-4 rounded-lg flex items-start gap-3 ${
+                type === 'success' 
+                    ? 'bg-green-50 text-green-800 border border-green-200' 
+                    : 'bg-red-50 text-red-800 border border-red-200'
+            }`;
+            messageDiv.classList.remove('hidden');
+        }
+
+        function hideMessage() {
+            messageDiv.classList.add('hidden');
+        }
+
+        function validateURL(url) {
+            const patterns = [
+                /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\/.+$/,
+                /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/,
+                /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
+            ];
+            return patterns.some(pattern => pattern.test(url));
+        }
+
+        async function handleGenerate() {
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                showMessage('Please enter a YouTube URL', 'error');
+                return;
+            }
+
+            if (!validateURL(url)) {
+                showMessage('Invalid YouTube URL. Please check and try again.', 'error');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<div class="spinner mx-auto"></div>';
+            hideMessage();
+
+            try {
+                const response = await fetch(`${API_URL}/api/video-info`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to fetch video info');
+                }
+
+                const data = await response.json();
+                currentUrl = url;
+                videoTitle.textContent = data.title || url;
+                inputSection.classList.add('hidden');
+                downloadSection.classList.remove('hidden');
+                showMessage('Video found! Choose download option below.', 'success');
+            } catch (error) {
+                showMessage(error.message || 'Failed to validate URL. Please try again.', 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate';
+            }
+        }
+
+        async function handleDownload(type) {
+            const btn = type === 'video' ? downloadVideoBtn : downloadAudioBtn;
+            const originalHTML = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner mx-auto"></div>';
+            hideMessage();
+
+            try {
+                const endpoint = type === 'video' ? '/api/download/video' : '/api/download/audio';
+                const response = await fetch(`${API_URL}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: currentUrl })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Download failed');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = type === 'video' ? 'video.mp4' : 'audio.mp3';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                showMessage(`${type === 'video' ? 'Video' : 'Audio'} downloaded successfully!`, 'success');
+            } catch (error) {
+                showMessage(error.message || `Failed to download ${type}. Please try again.`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHTML;
+            }
+        }
+
+        function handleReset() {
+            urlInput.value = '';
+            currentUrl = '';
+            inputSection.classList.remove('hidden');
+            downloadSection.classList.add('hidden');
+            hideMessage();
+        }
+
+        // Event Listeners
+        generateBtn.addEventListener('click', handleGenerate);
+        downloadVideoBtn.addEventListener('click', () => handleDownload('video'));
+        downloadAudioBtn.addEventListener('click', () => handleDownload('audio'));
+        resetBtn.addEventListener('click', handleReset);
+        urlInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleGenerate();
+        });
+    </script>
+</body>
+</html>
